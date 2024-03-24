@@ -1,17 +1,17 @@
 "use client";
 
-
+import { toast } from "sonner";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { courses, } from "@/db/schema";
-
+import { courses, userProgress } from "@/db/schema";
+import { upsertUserProgress } from "@/actions/user-progress";
 
 import { Card } from "./card";
 
 type Props = {
   courses: typeof courses.$inferSelect[];
-  activeCourseId?: "test",
+  activeCourseId?: typeof userProgress.$inferSelect.activeCourseId;
 };
 
 export const List = ({ courses, activeCourseId }: Props) => {
@@ -21,6 +21,14 @@ export const List = ({ courses, activeCourseId }: Props) => {
   const onClick = (id: number) => {
     if (pending) return;
 
+    if (id === activeCourseId) {
+      return router.push("/learn");
+    }
+
+    startTransition(() => {
+      upsertUserProgress(id)  
+        .catch(() => toast.error("Something went wrong."));
+    });
   };
 
   return (
@@ -33,7 +41,7 @@ export const List = ({ courses, activeCourseId }: Props) => {
           imageSrc={course.imageSrc}
           onClick={onClick}
           disabled={pending}
-          active={true}
+          active={course.id === activeCourseId}
         />
       ))}
     </div>
