@@ -33,6 +33,7 @@ const LearnPage = async () => {
       <FeedWrapper>
         <Header title="Spanish" />
       </FeedWrapper>
+  
     </div>
   );
 };
